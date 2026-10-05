@@ -81,7 +81,7 @@ Phần base (chunking, vector store, agent RAG) **đã có sẵn và chạy đư
 ## Yêu cầu
 
 - **Kiến thức:** Python, RAG cơ bản (embedding, top-k retrieval). Chưa cần biết Neo4j hay Cypher; guide có hướng dẫn.
-- **Công cụ:** Python 3.11, Docker Desktop, Git, và API key của **ít nhất một provider**: OpenAI (chính), OpenRouter, Gemini hoặc Anthropic. Nếu chỉ dùng Anthropic cho chat, cần thêm OpenAI/OpenRouter/Gemini cho embedding vì Anthropic không có embedding API.
+- **Công cụ:** Python 3.11, Docker Desktop, Git, và **API key OpenRouter** (mặc định cho cả chat và embedding). Lấy key tại [OpenRouter](https://openrouter.ai/settings/keys), copy `.env.example` thành `.env` và điền `OPENROUTER_API_KEY`. Có thể cấu hình provider khác theo LAB_GUIDE.
 - **Chi phí API:** khoảng **0,01–0,05 USD** cho mỗi lần chạy benchmark (`gpt-4o-mini`).
 - **Thời gian:** khoảng 5 giờ (setup 20', thiết kế ontology 40', code 2 giờ, benchmark và phân tích 1 giờ, báo cáo 40').
 
@@ -99,7 +99,7 @@ Phần base (chunking, vector store, agent RAG) **đã có sẵn và chạy đư
 │   └── benchmark_kg.json ← 6 câu hỏi, đáp án chuẩn, từ khóa bắt buộc
 ├── src/
 │   ├── graph.py          ← ★ TODO KG-1..KG-4 + ontology gợi ý (HINT)
-│   ├── llm.py            ← OpenAI chính + OpenRouter/Gemini/Anthropic dự phòng, có đo token/USD/giây
+│   ├── llm.py            ← OpenRouter mặc định, hỗ trợ thêm OpenAI/Gemini/Anthropic, có đo token/USD/giây
 │   └── chunking.py, store.py, agent.py, embeddings.py, models.py  ← base RAG (có sẵn)
 ├── scripts/
 │   ├── crawl_drug_corpus.py   ← crawl lại 2 KB
