@@ -119,27 +119,7 @@ $ .\.venv\Scripts\python.exe -m pytest tests/ -q
 52 passed, 2 subtests passed in 0.16s
 ```
 
-### Benchmark đầy đủ đối chiếu với kết quả ở mục 1–4
-
-Các số liệu dưới đây được chép từ `ket_qua_benchmark_kg.txt`:
-
-```text
-Chat model: openrouter:openai/gpt-4o-mini | Embedding: openrouter:openai/text-embedding-3-small | top_k=3 | chunk_size=800 | chunks=176 | KG: 205 nodes / 379 rels
-
-== Indexing (one-off)
-pipeline  calls    in_tok  out_tok       USD  seconds
-flat        176     56072        0   0.00112     84.8
-graph       196     91958     4573   0.00925    144.9
-
-== Querying (mean per question)
-pipeline  recall  judge   in_tok  out_tok       USD  seconds
-flat        0.43   1.00      694       47   0.00013     2.37
-graph       0.69   1.33     3233       78   0.00052     2.81
-```
-
 ### Kiểm tra hợp đồng bằng `--check`
-
-Log `--check` mới nhất do người dùng cung cấp:
 
 ```text
 $ .\.venv\Scripts\python.exe .\bench_kg.py --check
