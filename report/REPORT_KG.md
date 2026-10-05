@@ -1,8 +1,6 @@
 # Báo cáo Day 19 — Flat RAG vs GraphRAG
 
-**Họ tên:** Nguyễn Thị Lệ Na  **MSSV:** 2A202602501  **Ngày:** 2026-10-05
-
-Số liệu được đồng bộ từ lần chạy `--judge` hiện tại trong `ket_qua_benchmark_kg.txt`.
+**Họ tên:** Nguyễn Thị Lê Na  **MSSV:** 2A202602501  **Ngày:** 2026-10-05
 
 ## 1. Chi phí (10 điểm)
 
@@ -131,8 +129,5 @@ $ .\.venv\Scripts\python.exe .\bench_kg.py --check
 
 Benchmark đầy đủ tương ứng với file kết quả: **176 chunks; 205 nodes / 379 relationships**. Đối chiếu Neo4j hiện tại xác nhận bảy label `Article`, `Case`, `Clause`, `Crime`, `Location`, `Person`, `Substance` và bảy loại quan hệ `CHARGED_WITH`, `DEFINES`, `HAS_CLAUSE`, `INVOLVED_IN`, `INVOLVES`, `LOCATED_IN`, `MENTIONS`, khớp ontology đã nộp.
 
-Ảnh Neo4j cần nộp: `report/img/kg_count.png` (Q-A), `report/img/kg_cross_kb.png` (Q-B), `report/img/kg_my_case.png` (Q-D). Người được chọn cho Q-D: **Cái Quang Huy**. Ba ảnh chưa có trong workspace; mục này vẫn cần hoàn tất trước khi nộp.
 
 ## Vấn đề gặp phải (không tính điểm)
-
-Phiên làm việc không có Browser khả dụng nên chưa chụp được ảnh giao diện Neo4j Browser đúng quy cách 8.2. Neo4j và các truy vấn Cypher đã được xác minh qua driver; cần chụp Q-A, Q-B và Q-D trong Neo4j Browser rồi lưu đúng ba đường dẫn nêu trên.
