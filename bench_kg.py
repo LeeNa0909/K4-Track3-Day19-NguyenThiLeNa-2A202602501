@@ -1,15 +1,3 @@
-"""Flat RAG vs GraphRAG (Neo4j) on the two drug knowledge bases: accuracy, latency, tokens, USD.
-
-    docker run -d --name neo4j-drug-kg -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password123 neo4j:5
-    python bench_kg.py --build --limit 2   # load law + 2 news articles into Neo4j with YOUR build_graph (KG-2)
-    python bench_kg.py --build             # load both full KBs (~20 LLM calls, ~0.01 USD)
-    python bench_kg.py --check    # self-check KG-1..KG-4 on 1 news article (~1 LLM call, < 0.001 USD)
-    python bench_kg.py            # needs an API key in .env (OpenAI, OpenRouter, Gemini or Anthropic — see src/llm.py)
-    python bench_kg.py --judge    # + LLM-as-judge score (metered separately, not counted in pipeline cost)
-
-Writes ket_qua_benchmark_kg.txt (summary table + every answer).
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -66,8 +54,9 @@ def make_llm():
         llm = llm_mod.MeteredLLM()
     except (RuntimeError, ImportError) as error:
         fail("SETUP-1", f"Chưa dùng được provider LLM: {error}",
-             "copy .env.example thành .env, điền ít nhất một key: OPENAI_API_KEY, OPENROUTER_API_KEY, "
-             "GEMINI_API_KEY hoặc ANTHROPIC_API_KEY (Anthropic chỉ dùng cho chat; embedding cần một trong 3 key đầu).")
+             "copy .env.example thành .env, điền OPENROUTER_API_KEY; "
+             "đặt LLM_PROVIDER=openrouter và EMBEDDING_PROVIDER=openrouter. "
+             "Nếu dùng provider khác, xem LAB_GUIDE.md mục Chọn provider.")
     print(f"[provider] chat = {llm.chat_model} | embedding = {llm.embedding_model}")
     return llm
 
@@ -171,7 +160,7 @@ def build(limit: int | None) -> int:
         print(f"  Label không có doc_id: {', '.join(shared)} "
               "(chỉ hợp lệ nếu là node dùng chung giữa nhiều tài liệu, ví dụ tội danh, chất)")
     graph.close()
-    print("Mở http://localhost:7474 để xem graph (LAB_GUIDE.md Bước 8.1).")
+    print("Mở http://localhost:7474 để xem graph.")
     return 0
 
 def main() -> int:
