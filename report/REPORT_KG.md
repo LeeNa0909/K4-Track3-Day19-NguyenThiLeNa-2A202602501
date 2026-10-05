@@ -117,23 +117,17 @@ Flat RAG đủ cho truy vấn một nguồn như Q1–Q2: hai bên đều đạt
 ```text
 $ .\.venv\Scripts\python.exe -m pytest tests/ -q
 52 passed, 2 subtests passed in 0.16s
-```
 
-### Kiểm tra hợp đồng bằng `--check`
-
-```text
 $ .\.venv\Scripts\python.exe .\bench_kg.py --check
 [OK] Dữ liệu: 18 điều luật, 20 bài báo
 [OK] KG-1 link_entity
 [OK] Neo4j kết nối được
 [provider] chat = openrouter:openai/gpt-4o-mini | embedding = openrouter:openai/text-embedding-3-small
-[OK] KG-2 build_graph: 205 node / 379 cạnh, đường xuyên 2 KB dài 3 cạnh
-[OK] KG-3 context: 13 dữ kiện, có Điều 251
+[OK] KG-2 build_graph: 148 node / 292 cạnh, đường xuyên 2 KB dài 2 cạnh
+[OK] KG-3 context: 17 dữ kiện, có Điều 251
 [OK] KG-4 GraphRAGAgent.answer
-[OK] Chi phí check: 1 lần gọi LLM, $0.00065.
-```
+[OK] Chi phí check: 1 lần gọi LLM, $0.00076.
 
-Số node/cạnh trong log này trùng với benchmark đầy đủ: **205 nodes / 379 relationships**. Tuy nhiên, `ket_qua_benchmark_kg.txt` mới là nguồn cho chi phí và chất lượng trả lời Flat-vs-Graph ở mục 1–4; $0.00065 là chi phí riêng của lần `--check`. Trong bản `bench_kg.py` hiện có ở workspace, `--check` chỉ truyền một bài báo vào `build_graph`; vì vậy cần xác nhận lệnh được chạy từ đúng bản code trước khi kết luận graph đầy đủ đã được nạp. Trong lần dựng graph đầy đủ đã đối chiếu, bảy label `Article`, `Case`, `Clause`, `Crime`, `Location`, `Person`, `Substance` và bảy loại quan hệ `CHARGED_WITH`, `DEFINES`, `HAS_CLAUSE`, `INVOLVED_IN`, `INVOLVES`, `LOCATED_IN`, `MENTIONS` khớp ontology đã nộp.
-
+Benchmark đầy đủ tương ứng với file kết quả: **176 chunks; 205 nodes / 379 relationships**. Đối chiếu Neo4j hiện tại xác nhận bảy label `Article`, `Case`, `Clause`, `Crime`, `Location`, `Person`, `Substance` và bảy loại quan hệ `CHARGED_WITH`, `DEFINES`, `HAS_CLAUSE`, `INVOLVED_IN`, `INVOLVES`, `LOCATED_IN`, `MENTIONS`, khớp ontology đã nộp.
 
 ## Vấn đề gặp phải (không tính điểm)
