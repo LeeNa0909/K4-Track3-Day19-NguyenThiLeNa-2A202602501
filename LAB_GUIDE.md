@@ -25,36 +25,47 @@ Làm **đúng thứ tự**. Mỗi bước có **lệnh kiểm tra** và **dấu 
 
 ## Bước 0 — Setup
 
-**Cần có:** Python 3.11, Docker Desktop (đang chạy), và ít nhất một API key: OpenAI (khuyên dùng), OpenRouter, Gemini hoặc Anthropic. Anthropic chỉ dùng cho chat; embedding cần OpenAI/OpenRouter/Gemini.
+**Cần có:** Python 3.11, Docker Desktop (đang chạy), và API key **OpenRouter** để dùng cấu hình mặc định cho cả chat và embedding.
 
-> **Bật Docker Desktop trước** mỗi khi chạy lệnh `docker run` / `docker start neo4j-drug-kg` (kể cả mỗi lần mở lại máy). Đợi biểu tượng Docker chuyển xanh rồi mới chạy. Nếu chưa bật, lệnh báo `cannot connect to the Docker daemon`.
+> **Mở Docker Desktop trên Windows:** nhấn **Start**, gõ `Docker Desktop`, rồi mở ứng dụng. Logo cá voi Docker sẽ nằm ở khay hệ thống góc phải thanh taskbar, cạnh đồng hồ; nếu không thấy, bấm dấu `^` để mở các biểu tượng ẩn. Màu icon có thể khác theo giao diện, nên đừng dựa vào việc icon chuyển xanh. Trong PowerShell, kiểm tra engine đã sẵn sàng bằng `docker info --format '{{.ServerVersion}}'`; nếu lệnh in ra phiên bản Docker, tiếp tục bước dưới. Docker cần được mở trước mỗi lần chạy `docker run` hoặc `docker start neo4j-drug-kg`.
 
-```bash
+```powershell
 # 1. Môi trường Python
-py -3.11 -m venv .venv            # macOS/Linux: python3.11 -m venv .venv
-.venv\Scripts\activate             # macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+# Repo nhắm Python 3.11: bỏ dấu # ở dòng dưới nếu py -3.11 đã cài trên máy.
+# py -3.11 -m venv .venv
+# Nếu chưa có Python 3.11, dùng Python mặc định đã cài (máy hiện tại dùng Python 3.12).
+python -m venv .venv
+
+# Đường dẫn dự án có dấu tiếng Việt; đặt terminal dùng UTF-8.
+$env:PYTHONIOENCODING = "utf-8"
+
+# Chỉ cho phép chạy script trong cửa sổ PowerShell hiện tại để kích hoạt venv.
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 
 # 2. Neo4j. Chỉ chạy lệnh này lần đầu; các lần sau dùng: docker start neo4j-drug-kg
 docker run -d --name neo4j-drug-kg -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password123 neo4j:5
 
 # 3. API key
 copy .env.example .env             # macOS/Linux: cp .env.example .env
-#    mở .env, điền ít nhất một key; xem bảng provider bên dưới
+#    mở .env, điền OPENROUTER_API_KEY; xem hướng dẫn bên dưới
 ```
 
 ### Chọn provider
 
-Provider chính và rẻ nhất cho baseline là **OpenAI**. OpenRouter, Gemini và Anthropic là phương án dự phòng. `bench_kg.py` in provider thực tế ở đầu mỗi lần chạy để số liệu benchmark không bị lẫn.
+Provider mặc định là **OpenRouter** cho cả chat và embedding. Đăng nhập [OpenRouter](https://openrouter.ai/settings/keys), tạo API key và điền vào `OPENROUTER_API_KEY` trong `.env`. Giữ `LLM_PROVIDER=openrouter` và `EMBEDDING_PROVIDER=openrouter` như cấu hình mẫu. `bench_kg.py` in provider thực tế ở đầu mỗi lần chạy để số liệu benchmark không bị lẫn.
+
+OpenRouter dùng endpoint `https://openrouter.ai/api/v1` qua SDK `openai`; tên model có tiền tố `openai/` là model được gọi qua OpenRouter và dùng key OpenRouter. Xem [hướng dẫn SDK](https://openrouter.ai/docs/quickstart) và [API embedding](https://openrouter.ai/docs/api/api-reference/embeddings/create-embeddings).
 
 | Provider chat | Key trong `.env` | Model mặc định | Embedding dùng |
 | --- | --- | --- | --- |
-| **OpenAI (chính)** | `OPENAI_API_KEY` | `gpt-4o-mini` | OpenAI `text-embedding-3-small` |
-| OpenRouter | `OPENROUTER_API_KEY` | `openai/gpt-4o-mini` | OpenRouter `openai/text-embedding-3-small` |
+| **OpenRouter (mặc định)** | `OPENROUTER_API_KEY` | `openai/gpt-4o-mini` | OpenRouter `openai/text-embedding-3-small` |
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o-mini` | OpenAI `text-embedding-3-small` |
 | Gemini | `GEMINI_API_KEY` | `gemini-2.5-flash-lite` | Gemini `gemini-embedding-001` |
 | Anthropic | `ANTHROPIC_API_KEY` | `claude-opus-5-5` | **Không có embedding API**: phải thêm key OpenAI/OpenRouter/Gemini |
 
-Nếu có nhiều key, tự động ưu tiên: **OpenAI → OpenRouter → Gemini → Anthropic**. Muốn ép provider:
+Nếu bỏ `LLM_PROVIDER` và `EMBEDDING_PROVIDER`, tự động ưu tiên: **OpenRouter → OpenAI → Gemini → Anthropic**. Muốn dùng provider khác, thay hai giá trị này trong `.env` và điền key tương ứng, ví dụ:
 
 ```dotenv
 LLM_PROVIDER=anthropic
@@ -519,7 +530,7 @@ Pipeline có những điểm yếu **thật**, điển hình của GraphRAG ngo�
 | `[LỖI SETUP-3]` Neo4j từ chối đăng nhập | Mật khẩu trong `.env` khác lúc `docker run` | Sửa `NEO4J_PASSWORD`. Quên mật khẩu: `docker rm -f neo4j-drug-kg` rồi chạy lại `docker run` |
 | `[LỖI DATA-1]` thiếu dữ liệu | `data/drug_*` trống | `python scripts/crawl_drug_corpus.py --news-limit 20` |
 | `docker: … port is already allocated` | Cổng 7474 hoặc 7687 đang bị chiếm | `docker ps -a` → `docker rm -f <container cũ>` |
-| `docker: … cannot connect to the Docker daemon` / `pipe/dockerDesktopLinuxEngine` | Docker Desktop chưa mở | Mở Docker Desktop, đợi biểu tượng chuyển xanh |
+| `docker: … cannot connect to the Docker daemon` / `pipe/dockerDesktopLinuxEngine` | Docker Desktop chưa mở hoặc engine chưa sẵn sàng | Mở Docker Desktop từ Start, chờ khởi động xong, rồi chạy `docker info --format '{{.ServerVersion}}'` để kiểm tra |
 | Lỗi authentication / 401 | Key của provider đã chọn sai hoặc bị thu hồi | Kiểm tra dòng `[provider]` khi chạy, rồi thay đúng key trong `.env` |
 | Lỗi rate limit / 429 / `insufficient_quota` | Provider hết credit hoặc gọi quá nhanh | Nạp credit, đợi 1 phút, hoặc chọn provider khác bằng `LLM_PROVIDER` + `EMBEDDING_PROVIDER` |
 | `UnicodeEncodeError: 'charmap'` | Terminal Windows không dùng UTF-8 | `$env:PYTHONIOENCODING="utf-8"` (PowerShell) hoặc `export PYTHONIOENCODING=utf-8` (Git Bash) |
