@@ -1,6 +1,6 @@
 # Thiết kế Ontology — Day 19
 
-**Họ tên:** Nguyễn Thị Lệ Na  **MSSV:** 2A202602501
+**Họ tên:** Nguyễn Thị Lê Na  **MSSV:** 2A202602501
 
 **Lựa chọn:** Dùng ontology gợi ý trong `src/graph.py` (các hàm `HINT`). Bản này ưu tiên khớp với ontology sẽ triển khai ở KG-2, không đăng ký xét bonus tự thiết kế.
 
