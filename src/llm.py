@@ -2,8 +2,8 @@
 
 Providers (pick with env vars, otherwise the first one in PROVIDER_ORDER that has an API key wins):
 
-    LLM_PROVIDER        = openai | openrouter | gemini | anthropic    (chat)
-    EMBEDDING_PROVIDER  = openai | openrouter | gemini                (Anthropic has no embedding API)
+    LLM_PROVIDER        = openrouter | openai | gemini | anthropic    (chat)
+    EMBEDDING_PROVIDER  = openrouter | openai | gemini                (Anthropic has no embedding API)
     <PROVIDER>_CHAT_MODEL / <PROVIDER>_EMBEDDING_MODEL override the default models below.
 
 One run uses one provider for the whole benchmark — no mid-run failover, so cost/quality numbers stay comparable.
@@ -27,7 +27,7 @@ PROVIDERS = {
     "anthropic": {"key": "ANTHROPIC_API_KEY", "base_url": None,
                   "chat": "claude-opus-5-5", "embed": None},
 }
-PROVIDER_ORDER = ["openai", "openrouter", "gemini", "anthropic"]
+PROVIDER_ORDER = ["openrouter", "openai", "gemini", "anthropic"]
 
 # USD per 1M tokens (input, output). Check each provider's pricing page before reporting real numbers.
 PRICES_PER_M = {
