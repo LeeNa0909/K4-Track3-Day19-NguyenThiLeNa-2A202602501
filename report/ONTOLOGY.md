@@ -2,9 +2,7 @@
 
 **Họ tên:** Nguyễn Thị Lê Na  **MSSV:** 2A202602501
 
-**Lựa chọn:** Dùng ontology gợi ý trong `src/graph.py` (các hàm `HINT`). Bản này ưu tiên khớp với ontology sẽ triển khai ở KG-2, không đăng ký xét bonus tự thiết kế.
-
-**Dữ liệu đã đối chiếu:** `data/drug_law/blhs-dieu-251.md`; `data/drug_law/pcmt-dieu-2.md` cho định nghĩa ở Q1; các Điều 250 và 255 cho Q5/Q4; các bài tin về đường dây 36 kg (`news-100260928173914514`), Lê Minh Thành (`news-100260918080821054`), Hoàng Nato (`news-100260925144412498`), Cái Quang Huy (`news-100260917203001265`), và vụ Viện Pháp y tâm thần (`news-100260930085028036`); toàn bộ sáu câu trong `data/benchmark_kg.json`.
+**Lựa chọn:** Dùng ontology gợi ý trong `src/graph.py` (các hàm `HINT`).
 
 ## 1. Sơ đồ
 
@@ -34,10 +32,6 @@ flowchart LR
 | `Location` | Địa điểm liên quan vụ án | `name` | `name` | Tin | LLM |
 | `Substance` | Chất ma túy hoặc tiền chất được nhắc đến | `name` theo danh sách tên chuẩn | `name` | Cả luật và tin | Luật: quét danh sách bằng `find_substances`; tin: LLM chọn tên trong danh sách chuẩn khi khớp |
 
-`doc_id` gắn vào node có nguồn từ một tài liệu cụ thể (`Article`, `Clause`, `Case`) để truy ngược tài liệu seed. Các node dùng chung như `Crime` và `Substance` được `MERGE` theo tên chuẩn, nên có thể nối nhiều tài liệu.
-
-Parser hiện tại dùng biểu thức `^số.` để tạo `Clause`. Vì vậy, các mục được đánh số trong phần giải thích từ ngữ của Điều 2 Luật PCMT cũng được biểu diễn bằng label `Clause`: định nghĩa “tiền chất” là `Clause {number: 4}`. Đây là cách biểu diễn theo parser của lab, không khẳng định mục đánh số đó là “khoản” theo cách phân loại pháp lý.
-
 ## 3. Relationships
 
 | Type | Từ → Đến | Properties trên cạnh | Ý nghĩa |
@@ -58,8 +52,6 @@ Parser hiện tại dùng biểu thức `^số.` để tạo `Clause`. Vì vậy
 - **Khi nào cầu gãy, và xử lý thế nào:** tên tội do LLM trích không khớp đủ ngưỡng, thiếu Điều luật liên quan, hoặc điều luật không có trong KB luật. Khi không ánh xạ được thì không tạo liên kết sang một `Crime` chuẩn khác; cần kiểm tra văn bản trích xuất, danh sách tên tội và Điều luật tương ứng. Cầu cũng gãy nếu hai phía dùng tên chuẩn khác nhau.
 
 ## 5. Competency questions
-
-Các mẫu dưới đây là đường đi dự kiến trên graph theo ontology gợi ý. Q1 và Q2 là truy vấn một KB; Q3–Q5 đi xuyên hai KB qua `Crime`; Q6 tổng hợp vụ việc theo `Substance`.
 
 | Câu | Đường đi (Cypher pattern) | Trả lời được? |
 | --- | --- | --- |
@@ -92,4 +84,3 @@ Không xét bonus tự thiết kế ở checkpoint này: dùng ontology gợi ý
 - `Substance` dùng tên làm khóa nhưng chưa gộp đầy đủ tên đồng nghĩa và biến thể; `find_substances` chỉ nhận các tên trong danh sách sẵn có.
 - Các ngưỡng khối lượng, thể tích và điểm a/b/c nằm trong `Clause.text`; ontology chưa biểu diễn từng điều kiện thành node/property có cấu trúc để so sánh số lượng tự động.
 - Chưa có label hoặc quan hệ riêng cho giai đoạn tố tụng; `CHARGED_WITH` không phân biệt bắt, khởi tố, truy tố, xét xử sơ thẩm hay phúc thẩm.
-- Đã đối chiếu graph đầy đủ sau lần chạy benchmark hiện tại với ontology: có đủ 7 label (`Article`, `Case`, `Clause`, `Crime`, `Location`, `Person`, `Substance`) và 7 quan hệ (`CHARGED_WITH`, `DEFINES`, `HAS_CLAUSE`, `INVOLVED_IN`, `INVOLVES`, `LOCATED_IN`, `MENTIONS`). Số lượng node thay đổi giữa các lần build do LLM trích xuất tên thực thể/vụ không hoàn toàn ổn định; loại label và quan hệ vẫn khớp.
